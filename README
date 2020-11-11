@@ -1,0 +1,160 @@
+Nume: Dragne Lavinia-Stefana
+Grupa: 314 CA
+
+PROGRAMAREA CALCULATOARELOR
+Tema #3 Fisiere, Stringuri si Structuri
+
+Acesta este fisierul README corespunzator prezentarii implementarii rezolvarilor mele la tema 3.
+
+Continutul proiectului este urmatorul:
+
+-archiver.c contine codul sursa al programului corespunzator Task-ului 0,1,2 si 3;
+
+-un fisier Makefile ce are urmatoarele utilizari:
+	-build: compileaza codul sursa in executabil pentru fiecare problema;
+	-clean: sterge toate executabilele create;
+
+-acest fisier README.
+
+Prezentarea solutiei:
+
+Semnificatia variabilelor:
+
+comanda[]=un string in care retin comanda primita
+copie[]=o copie pentru comanda, pentru ca strtok "va strica" comanda initiala
+
+Functia create(functie asociata comenzii create):
+* p=pointer folosit pentru functia strtok sa delimitez comanda in "cuvinte" separate prin spatiu
+* arhiva=pointer pentru numele arhivei
+* director=pointer pentru numele directorului in care se afla fisierele usermap si files
+* f= pointer pentru arhiva
+* g= pointer pentru fisierul "files.txt"
+* h= pointer pentru fisierul "usermap.txt"
+* k= pointer pentru fisierul ce trebuie arhivat
+ok= variabila in care retin numarul de cuvinte al comenzii date
+arch= o uniune ce contine header-ul asociat fiecarui fisier, ce trebuie arhivat
+line[]= un string in care retin fiecare linie, pana la enter, din files.txt
+* r= pointer folosit de strtok pentru impartirea liniei, din files.txt, in "cuvinte", despartite prin spatiu
+info= structura folosita de functia mktime, pentru a obtine un integer, ce contine numarul de secunde,
+      intre 1 Ianuarie 1970 00:00 și timpul ultimei modificari, a fisierului ce trebuie arhivat
+nr= intreg ce retine la al catelea cuvant din linie sunt
+dimd= size-ul fisierului, convertit in integer
+line1[]= un string in care retin fiecare linie, pana la enter, din usermap.txt
+ok1= o variabila, de tip switch, care imi spune daca numele fisierului
+     din files.txt a fost gasit printre campurile lui usermap.txt
+dim= suma între toti octetii, ce alcătuiesc header-ul
+nume[]= string asociat numelui fisierului, ce trebuie arhivat
+x= intreg ce retine numarul de blocuri intregi de 512 bytes ai fisierului
+
+Functia list(functie asociata comenzii list):
+* p= pointer folosit pentru functia strtok sa delimitez comanda in "cuvinte" separate prin spatiu
+* arhiva= pointer pentru numele arhivei
+ok= variabila in care retin numarul de cuvinte al comenzii date
+* f= pointer pentru arhiva
+* name= pointer pentru numele fiecarui fisier din arhiva
+* size= pointer pentru size-ul fiecarui fisier din arhiva
+dim= size-ul fiecarui fisier, convertit in intreg, in baza 10
+nrbloc= numarul de blocuri de date intregi, de 512 octeti  
+poz= pozitia cursorului in arhiva
+
+Functia extract(functie asociata comenzii extract): 
+* arhiva= pointer pentru numele arhivei
+* arhiva= pointer pentru numele arhivei
+* fisier= poineter pentru numele fisierului ce va fi dezarhivat
+ok= variabila in care retin numarul de cuvinte al comenzii date
+* f= pointer pentru arhiva
+* name= pointer pentru numele fiecarui fisier din arhiva
+* size= pointer pentru size-ul fiecarui fisier din arhiva
+dim= size-ul fiecarui fisier convertit in intreg, in baza 10
+nrbloc= numarul de blocuri de date intregi, de 512 octeti  
+poz= pozitia cursorului in arhiva
+ok1= variabila de tip switch care imi spune daca am gasit sau nu fisierul ce vreau sa-l dezarhivez in arhiva
+* g= pointer pentru numele fisierului extras, concatenat cu structura "extracted_"
+x= intreg ce retine numarul de blocuri intregi de 512 de date ale fisierului
+
+Algoritmul:
+
+Task-ul 0-Archiver
+
+Stochez comanda intr-un string "comanda[]", pe care il delimitez cu strtok, in functie de spatii, in cuvinte.
+In functie de primul cuvant, daca acesta denumeste una dintre cele 3 functii(create, list, extract),
+apelez functia corespunzatoare comenzii primite. Am grija sa fac o copie a comenzii,
+pentru ca functia strtok o strica. De asemenea, daca comanda este una gresita, deci primul cuvant nu este unul
+dintre cele 3 sau este "\n", afisez un mesaj corespunzator. Continui citirea comenzilor, de la STDIN, pana intalnesc comanda "exit". 
+
+Task-ul 1-Create
+
+Functia create primeste ca parametru comanda.
+Impart comanda in cuvinte si astfel retin numele directorului, in care se afla fisierele files si usermap si
+numele arhivei ce trebuie create. Daca comanda este corecta(are numarul de parametri corecti) deschid arhiva,
+pentru a scrie in ea, si deschid si cele 2 fisiere text, din care citesc datele necesare. Daca deschiderea celor 2 fisiere
+nu a avut loc cu succes, afisez un mesaj corespunzator. Citesc linie cu linie din fisierul files.txt, pana la enter.
+Functia fgets citeste si ultimul "\n" din fisier, acela este semnul ca fisierul files a ajuns la final si va fi implicit
+conditia de oprire a citirii. 
+Initializez primele 4 char-uri din campul mode cu '0'. Primul "cuvant" din fisierul files.txt il reprezinta permisiunile.
+Acesta va fi un string cu 9 caractere. Primele 3 sunt dedicate permisiunilor pentru user, urmatoarele 3 pentru groups
+si ultimele 3 pentru others. Calculez pentru fiecare categorie (user, group, others) permisunea, asociind, in functia permisision,
+caracterelor (r,w,e,-) numarul corespunzator in octal. Le memorez in al 4,5,6 byte din mode. Pe byte-ul numarul 7 va fi un '\0'. 
+Al treilea "cuvant" din fisierul files.txt este uname-ul. Il completez in header-ul asociat fisierului, ce trebuie arhivat, si
+completez pana la 32 cu '\0'. Cel de-al patrulea "cuvant" este gname-ul si se procedeaza si pentru acesta in mod analog.
+Al cincilea "cuvant" este size-ul, ce trebuie convertit in intreg si apoi scris in octal, cu cate valori de 0
+sunt necesare in fata, in header. Pe ultimul byte din size punem '\0'. 
+Cel de-al saselea camp este o structura formata din anul, luna, ziua ultimei modificari ale fisierului.
+Pe fiecare le convertesc in intregi, folosindu-ma de codul lor ASCII, si le stochez in structura info,
+initializata cu 0 toata. La fel si pentru ce-al de-al saptelea camp, ce contine ora, minutul si secunda ultimei modificari.
+In final, folosind functia mktime, din biblioteca time.h, stochez in variabila ret,
+valoarea ultimei modificari, care reprezintă numărul de secunde, care au trecut de la 1 Ianuarie 1970 00:00, 
+pana la data ultimei modificari. Valoarea o stochez in campul mtime, din header.
+Cel de-al noulea camp este reprezentat de name, care este identic cu linkname-ul. 
+Le scriu in header si completez pana la 100 cu '\0'.
+Completez typeflag, magic, devminor si devmajor cu valorile implicite, date de enunt.
+Deschid fisierul "usermap.txt" si pe baza numelui fisierului, extras din "files.txt",
+extrag cu strtok si uid-ul si gid-ul fisierului.
+Pe acestea le convertesc in intregi, in octal, si le scriu in header, avand grija sa completez
+pana la dimensiunea campurilor cu '\0'. 
+Functia chksum primeste ca parametru uniunea arch si intoarce suma între toti octetii, ce alcătuiesc header-ul.
+Astfel, cu mai multe for-uri, parcurg header-ul si adun la suma, codul ASCII corespunzator fiecarui caracter.
+String-ul corespunzator chksum-lui il consider plin de spatii, adica voi aduna codul ASCII pentru ' ' de 8 ori,
+cat este dimensiunea campului chksum, din header. Pe penutlima pozitie din chksum va fi un ' ', iar pe ultima un '\0'. 
+Ma pozitionez cu cursorul la inceputul fisierului usermap.txt, pentru ca la urmatoarea iteratie cautarea numelui
+fisierului sa inceapa de la prima linie. 
+Functia write_archive scrie, in arhiva, header-ul si il completeaza cu '\0' pana la 512. 
+Deschid fisierul, ce trebuie arhivat, pentru a citi datele din el, tinand cont ca trebuie sa-i concatenez
+si calea catre directorul in care se afla. Daca fisierul nu se poate deschide cu succes afisez un mesaj corespunzator. 
+Impart datele, pe baza size-ului, in blocuri complete de 512 octeti. Initializez numarul de blocuri+1 de 512 octeti cu '\0'
+si peste acestea scriu, in arhiva, datele din fisierul ce trebuie arhivat. Astfel ultimul bloc,
+desi nu este complet, va fi completat pana la 512 de '\0'. 
+Finalul arhivei il marchez de o zonă de 512 octeti de 0.
+In final, afisez mesajul "> Done!", inchid fisierele si eliberez memoria.   
+ 
+
+Task-ul 2-List
+
+Functia list primeste ca parametru stringul asociat comenzii.
+Impart comanda in cuvinte, pentru a afla numele arhivei, ce trebuie listate.
+In cazul in care comanda are numarul de parametri gresit, afisez un mesaj corespunzator. 
+Deschid arhiva, ce trebuie listata, si ma pozitionez cu cursorul pe name-ul primului
+fisier pe care il si printez pe ecran. Cat timp numele fisierului este diferit de '\0',
+adica nu am intrat inca in zona de 512 octeti de 0, de la finalul arhivei, va trebui sa listez nume de fisiere.
+Folosindu-ma de functia fseek, pozitionez cursorul pe campul corespunzator size-ului fisierului.
+El imi indica cate blocuri de date trebuie sa sar, pentru a ajunge la name-ul urmatorului fisier.
+Size-ul fisierului trebuie convertit din char, in int in baza 10. Se foloseste astfel functia decimal,
+ce trece un string, primit ca parametru, din baza 8 in baza 10. Aflu numarul de blocuri de octeti,
+ce trebuie sa le sar, si ma pozitionez cu cursorul pe urmatorul name pe care il afisez pe ecran.
+Urmez algoritmul pana la ultimul name de fisier. In final eliberez memoria si inchid arhiva. 
+
+Task-ul 3-Extract
+
+Functia extract primeste ca parametru stringul asociat comenzii. 
+Impart comanda in cuvinte si astfel retin numele arhivei, in care se afla fisierul, ce trebuie extras
+si numele acestuia. Daca comanda nu are numarul de parametri corecti, afisez un mesaj corespunzator("> Wrong command!").
+Deschid arhiva, iar daca operatia nu s-a efectuat cu succes, afisez mesajul "> File not found!".
+Folosindu-ma de un algoritm asemanator celui de la functia list, si anume, utilizand size-ul convertit
+in intreg in baza 10, al fiecarui fisier si de functia fseek, ce muta cursorul in arhiva la o pozitie data,
+caut sa gasesc in arhiva, numele fisierului, ce trebuie dezarhivat. Cu variabila de tip switch "ok"
+tin minte daca am gasit sau nu, numele fisierului.  Cand il gasesc, folosindu-ma, din nou, de size-ul
+fisierului, pozitionez cursorul la inceputul blocului de date corespunzator lui.
+Retin cate blocuri intregi de 512 octeti am si pe acestea le citesc din arhiva si scriu simultan
+in fisierul "extracted_fisier". Calculez numarul ramas de date, din ultimul bloc incomplet de octeti
+ai fisierului, si le scriu in "extracted_fisier".
+In final, afisez mesajul "> File extracted!", eliberez memoria, inchid arhiva si fisierul extras. 
